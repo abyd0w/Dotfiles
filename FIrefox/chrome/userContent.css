@@ -1,0 +1,78 @@
+/* ==========================================================================
+   userContent.css — new-tab / home page
+   Content sheets cannot read userChrome tokens, so the two values this page
+   needs are declared locally. Blur is not possible here: a page can only blur
+   what its own process paints, and the window picture is painted by the chrome.
+   The tile selectors are the page's own classes (no stable hooks exist).
+   ========================================================================== */
+
+@-moz-document url("about:newtab"), url("about:home") {
+
+  /* 1. Clear the page so the window picture shows through. */
+  :root,
+  body {
+    background: transparent !important;
+  }
+
+  /* 2. Shortcut tiles: glass squares that match the bars. */
+  :root {
+    --tile-tint: 20 20 26;
+    --tile-fill: rgb(var(--tile-tint) / 0.35);
+    --tile-fill-hover: rgb(var(--tile-tint) / 0.60);
+  }
+
+  .top-site-outer .tile {
+    background: var(--tile-fill) !important;
+    border: none !important;
+    border-radius: 18px !important;
+    box-shadow: none !important;
+    transition: background-color 0.15s;
+  }
+
+  .top-site-outer:is(:hover, :focus-within) .tile {
+    background: var(--tile-fill-hover) !important;
+  }
+
+  /* 3. Labels: legible on the picture, centred, never overlapping the tile. */
+  .top-site-outer .title {
+    color: #fff !important;
+    text-align: center !important;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.9) !important;
+    line-height: 1.25 !important;
+    padding-top: 6px !important;
+  }
+
+  /* 4. "Add shortcut" tile. It is not a .tile: Firefox renders a <moz-button
+        class="add-button"> (primary type) inside li.add-button-tile. Its look
+        comes from design-token variables, which inherit into the component, so
+        we set those on the host; ::part(button) is the documented hook for the
+        rest. */
+  moz-button.add-button {
+    --button-background-color-primary: var(--tile-fill) !important;
+    --button-background-color-primary-hover: var(--tile-fill-hover) !important;
+    --button-background-color-primary-active: var(--tile-fill-hover) !important;
+    --button-text-color-primary: #fff !important;
+    --button-text-color-primary-hover: #fff !important;
+    --button-text-color-primary-active: #fff !important;
+    --button-border-color-primary: transparent !important;
+    --button-border-color-primary-hover: transparent !important;
+    --button-border-color-primary-active: transparent !important;
+  }
+
+  moz-button.add-button::part(button) {
+    border-radius: 18px !important;
+  }
+
+  /* 5. Hide the customise (pen) button. Firefox renders it two ways, so both
+        are listed: <moz-button class="open-customization-button"> (Nova
+        layout) and <button class="personalize-button"> (classic layout).
+        Settings stay reachable at about:preferences#home. */
+  .open-customization-button,
+  .personalize-button {
+    display: none !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .top-site-outer .tile { transition: none; }
+  }
+}
